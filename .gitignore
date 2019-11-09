@@ -1,0 +1,8 @@
+*_data
+*_logs
+*~
+.*.swp
+.*.bak
+*.bak
+*.log
+.*.log

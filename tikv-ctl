@@ -1,0 +1,6 @@
+#!/bin/bash
+basedir=$(cd $(dirname $(readlink -f ${BASH_SOURCE:-$0}));pwd)
+cd ${basedir}
+cluster=$(perl -aF'\s+' -lne '$h{$F[1]}=$F[0] if /pd_server0/}{print join ",", map{"http://$h{$_}:2379"} sort keys %h' hosts)
+export PD_ADDR=${cluster}
+${basedir}/../tidb_all/tikv/bin/tikv-ctl $@

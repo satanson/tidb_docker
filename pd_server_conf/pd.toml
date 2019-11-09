@@ -1,0 +1,39 @@
+# PD Configuration
+initial-cluster-state = "new"
+
+enable-prevote = true
+lease = 3
+namespace-classifier = "table"
+tso-save-interval = "3s"
+
+[security]
+cacert-path = ""
+cert-path = ""
+key-path = ""
+
+[log]
+level = "info"
+
+[log.file]
+
+[metric]
+address = "192.168.173.100:9091"
+interval = "15s"
+job = "pd"
+
+[schedule]
+leader-schedule-limit = 4
+max-merge-region-keys = 0
+max-merge-region-size = 0
+max-pending-peer-count = 16
+max-snapshot-count = 3
+max-store-down-time = "30m"
+merge-schedule-limit = 8
+region-schedule-limit = 4
+replica-schedule-limit = 8
+split-merge-interval = "1h"
+tolerant-size-ratio = 5.0
+
+[replication]
+location-labels = ["zone", "rack", "host"]
+max-replicas = 3

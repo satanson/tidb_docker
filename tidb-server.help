@@ -1,0 +1,90 @@
+Usage of ../tidb_all/tidb/bin/tidb-server:
+  -L string
+    	log level: info, debug, warn, error, fatal (default "info")
+  -P string
+    	tidb server port (default "4000")
+  -V	print version information and exit (default false)
+  -advertise-address string
+    	tidb server advertise IP
+  -check.b
+    	Run benchmarks
+  -check.bmem
+    	Report memory benchmarks
+  -check.btime duration
+    	approximate run time for each benchmark (default 1s)
+  -check.exclude string
+    	Regular expression to exclude tests to run
+  -check.f string
+    	Regular expression selecting which tests and/or suites to run
+  -check.list
+    	List the names of all tests that will be run
+  -check.p
+    	Run suites in parallel
+  -check.v
+    	Verbose mode
+  -check.vv
+    	Super verbose mode (disables output caching)
+  -check.work
+    	Display and do not remove the test working directory
+  -config string
+    	config file path
+  -config-check
+    	check config file validity and exit (default false)
+  -config-strict
+    	enforce config file validity (default false)
+  -cors string
+    	tidb server allow cors origin
+  -enable-binlog
+    	enable generate binlog (default false)
+  -gocheck.b
+    	Run benchmarks
+  -gocheck.btime duration
+    	approximate run time for each benchmark (default 1s)
+  -gocheck.f string
+    	Regular expression selecting which tests and/or suites to run
+  -gocheck.list
+    	List the names of all tests that will be run
+  -gocheck.v
+    	Verbose mode
+  -gocheck.vv
+    	Super verbose mode (disables output caching)
+  -gocheck.work
+    	Display and do not remove the test working directory
+  -host string
+    	tidb server host (default "0.0.0.0")
+  -lease string
+    	schema lease duration, very dangerous to change only if you know what you do (default "45s")
+  -log-file string
+    	log file path
+  -log-slow-query string
+    	slow query file path
+  -metrics-addr string
+    	prometheus pushgateway address, leaves it empty will disable prometheus push.
+  -metrics-interval uint
+    	prometheus client push interval in second, set "0" to disable prometheus push. (default 15)
+  -path string
+    	tidb storage path (default "/tmp/tidb")
+  -plugin-dir string
+    	the folder that hold plugin (default "/data/deploy/plugin")
+  -plugin-load string
+    	wait load plugin name(separated by comma)
+  -proxy-protocol-header-timeout uint
+    	proxy protocol header read timeout, unit is second. (default 5)
+  -proxy-protocol-networks string
+    	proxy protocol networks allowed IP or *, empty mean disable proxy protocol support
+  -record
+    	to generate test result
+  -report-status
+    	If enable status report HTTP service. (default true)
+  -run-ddl
+    	run ddl worker on this tidb-server (default true)
+  -socket string
+    	The socket file to use for connection.
+  -status string
+    	tidb server status port (default "10080")
+  -status-host string
+    	tidb server status host (default "0.0.0.0")
+  -store string
+    	registered store name, [tikv, mocktikv] (default "mocktikv")
+  -token-limit int
+    	the limit of concurrent executed sessions (default 1000)

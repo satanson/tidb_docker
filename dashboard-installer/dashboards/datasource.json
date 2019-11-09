@@ -1,0 +1,7 @@
+{
+    "name": "tidb-cluster",
+    "type": "prometheus",
+    "url": "http://192.168.173.101:9090",
+    "access": "proxy",
+    "basicAuth": false
+}
