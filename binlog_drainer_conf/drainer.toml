@@ -1,0 +1,7 @@
+[syncer]
+db-type="mysql"
+[syncer.to]
+host="mysqld0"
+port=3306
+user="root"
+password="123456"

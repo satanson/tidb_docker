@@ -94,5 +94,6 @@ capacity = 10240000
 enabled = false
 
 [binlog]
+enable=true
 ignore-error = false
 write-timeout = "15s"

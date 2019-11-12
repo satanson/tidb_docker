@@ -2,13 +2,14 @@
 set -e -o pipefail
 basedir=$(cd $(dirname $(readlink -f ${BASH_SOURCE:-$0}));pwd)
 test  ${basedir} == ${PWD}
-
 tidbLocalRoot=$(cd ${basedir}/../tidb_all;pwd)
 tidbDockerRoot=/home/tidb/tidb_all
 
-pdNum=3
-tikvNum=10
-tidbNum=3
+pd_server_num=$(perl -ne 'print if /^\s*\d+(\.\d+){3}\s+pd_server\d+\s*$/' ${PWD}/hosts |wc -l);
+tikv_server_num=$(perl -ne 'print if /^\s*\d+(\.\d+){3}\s+tikv_server\d+\s*$/' ${PWD}/hosts |wc -l);
+tidb_server_num=$(perl -ne 'print if /^\s*\d+(\.\d+){3}\s+tidb_server\d+\s*$/' ${PWD}/hosts |wc -l);
+binlog_pump_num=$(perl -ne 'print if /^\s*\d+(\.\d+){3}\s+binlog_pump\d+\s*$/' ${PWD}/hosts |wc -l);
+binlog_drainer_num=$(perl -ne 'print if /^\s*\d+(\.\d+){3}\s+binlog_drainer\d+\s*$/' ${PWD}/hosts |wc -l);
 
 dockerFlags="-tid --rm -u tidb --privileged --net static_net0 -v ${PWD}/hosts:/etc/hosts -v ${tidbLocalRoot}:${tidbDockerRoot}"
 
@@ -29,7 +30,7 @@ bootstrap_pd_server(){
 }
 
 bootstrap_all_pd_server(){
-  for node in $(eval "echo pd_server{0..$((${pdNum}-1))}") ;do
+  for node in $(eval "echo pd_server{0..$((${pd_server_num}-1))}") ;do
     bootstrap_pd_server ${node}
   done
 }
@@ -40,7 +41,7 @@ stop_pd_server(){
 }
 
 stop_all_pd_server(){
-  for node in $(eval "echo pd_server{0..$((${pdNum}-1))}") ;do
+  for node in $(eval "echo pd_server{0..$((${pd_server_num}-1))}") ;do
     stop_pd_server ${node}
   done
 }
@@ -73,7 +74,7 @@ start_pd_server(){
 }
 
 start_all_pd_server(){
-  for node in $(eval "echo pd_server{0..$((${pdNum}-1))}") ;do
+  for node in $(eval "echo pd_server{0..$((${pd_server_num}-1))}") ;do
     start_pd_server ${node}
   done
 }
@@ -85,7 +86,7 @@ restart_pd_server(){
 }
 
 restart_all_pd_server(){
-  for node in $(eval "echo pd_server{0..$((${pdNum}-1))}") ;do
+  for node in $(eval "echo pd_server{0..$((${pd_server_num}-1))}") ;do
     restart_pd_server ${node}
   done
 }
@@ -100,7 +101,7 @@ bootstrap_tikv_server(){
 }
 
 bootstrap_all_tikv_server(){
-  for node in $(eval "echo tikv_server{0..$((${tikvNum}-1))}") ;do
+  for node in $(eval "echo tikv_server{0..$((${tikv_server_num}-1))}") ;do
     bootstrap_tikv_server ${node}
   done
 }
@@ -111,7 +112,7 @@ stop_tikv_server(){
 }
 
 stop_all_tikv_server(){
-  for node in $(eval "echo tikv_server{0..$((${tikvNum}-1))}") ;do
+  for node in $(eval "echo tikv_server{0..$((${tikv_server_num}-1))}") ;do
     stop_node ${node}
   done
 }
@@ -137,11 +138,11 @@ start_tikv_server(){
     --pd ${cluster} \
     --data-dir ${tidbDockerRoot}/tikv/data \
     --config ${tidbDockerRoot}/tikv/conf/tikv.toml \
-    --log-file ${tidbDockerRoot}/tikv/logs/tikv.log
+    --log-file ${tidbDockerRoot}/tikv/logs/tikv.log 
 }
 
 start_all_tikv_server(){
-  for node in $(eval "echo tikv_server{0..$((${tikvNum}-1))}") ;do
+  for node in $(eval "echo tikv_server{0..$((${tikv_server_num}-1))}") ;do
     start_tikv_server ${node}
   done
 }
@@ -153,7 +154,7 @@ restart_tikv_server(){
 }
 
 restart_all_tikv_server(){
-  for node in $(eval "echo tikv_server{0..$((${tikvNum}-1))}") ;do
+  for node in $(eval "echo tikv_server{0..$((${tikv_server_num}-1))}") ;do
     restart_tikv_server ${node}
   done
 }
@@ -168,7 +169,7 @@ bootstrap_tidb_server(){
 }
 
 bootstrap_all_tidb_server(){
-  for node in $(eval "echo tidb_server{0..$((${tidbNum}-1))}") ;do
+  for node in $(eval "echo tidb_server{0..$((${tidb_server_num}-1))}") ;do
     bootstrap_tidb_server ${node}
   done
 }
@@ -179,7 +180,7 @@ stop_tidb_server(){
 }
 
 stop_all_tidb_server(){
-  for node in $(eval "echo tidb_server{0..$((${tidbNum}-1))}") ;do
+  for node in $(eval "echo tidb_server{0..$((${tidb_server_num}-1))}") ;do
     stop_tidb_server ${node}
   done
 }
@@ -207,11 +208,11 @@ start_tidb_server(){
     --path=${cluster} \
     --config=${tidbDockerRoot}/tidb/conf/tidb.toml \
     --log-slow-query=${tidbDockerRoot}/tidb/log/tidb_slow_query.log \
-    --log-file=${tidbDockerRoot}/tidb/logs/tidb.log
+    --log-file=${tidbDockerRoot}/tidb/logs/tidb.log 
 }
 
 start_all_tidb_server(){
-  for node in $(eval "echo tidb_server{0..$((${tidbNum}-1))}") ;do
+  for node in $(eval "echo tidb_server{0..$((${tidb_server_num}-1))}") ;do
     start_tidb_server ${node}
   done
 }
@@ -223,8 +224,140 @@ restart_tidb_server(){
 }
 
 restart_all_tidb_server(){
-  for node in $(eval "echo tidb_server{0..$((${tidbNum}-1))}") ;do
+  for node in $(eval "echo tidb_server{0..$((${tidb_server_num}-1))}") ;do
     restart_tidb_server ${node}
+  done
+}
+
+start_binlog_pump(){
+  local node=${1:?"undefined pump"};shift
+	ip=$(perl -aF/\\s+/ -ne "print \$F[0] if /\b$node\b/" hosts)
+  cluster=$(perl -aF'\s+' -lne '$h{$F[1]}=$F[0] if /pd_server/}{print join ",", map{"http://$h{$_}:2379"} sort keys %h' hosts)
+  flags="
+  -v ${PWD}/${node}_data:${tidbDockerRoot}/binlog_pump/data
+  -v ${PWD}/${node}_logs:${tidbDockerRoot}/binlog_pump/logs
+  -v ${PWD}/binlog_pump_conf:${tidbDockerRoot}/binlog_pump/conf
+  --name $node
+  --hostname $node
+  --ip $ip
+  "
+  rm -fr ${PWD}/${node}_logs/*
+  mkdir -p ${PWD}/${node}_logs
+  docker run ${dockerFlags} ${flags} pingcap/rust:latest \
+    ${tidbDockerRoot}/tidb-binlog/bin/pump \
+    --config=${tidbDockerRoot}/binlog_pump/conf/pump.toml \
+    --log-file=${tidbDockerRoot}/binlog_pump/logs/pump.log \
+    --data-dir=${tidbDockerRoot}/binlog_pump/data \
+    --addr=${ip}:8250 \
+    --advertise-addr=${ip}:8250 \
+    --pd-urls=${cluster}
+}
+
+start_binlog_drainer(){
+  local node=${1:?"undefined drainer"};shift
+	ip=$(perl -aF/\\s+/ -ne "print \$F[0] if /\b$node\b/" hosts)
+  cluster=$(perl -aF'\s+' -lne '$h{$F[1]}=$F[0] if /pd_server/}{print join ",", map{"http://$h{$_}:2379"} sort keys %h' hosts)
+  flags="
+  -v ${PWD}/${node}_data:${tidbDockerRoot}/binlog_drainer/data
+  -v ${PWD}/${node}_logs:${tidbDockerRoot}/binlog_drainer/logs
+  -v ${PWD}/binlog_drainer_conf:${tidbDockerRoot}/binlog_drainer/conf
+  --name $node
+  --hostname $node
+  --ip $ip
+  "
+  rm -fr ${PWD}/${node}_logs/*
+  mkdir -p ${PWD}/${node}_logs
+  docker run ${dockerFlags} ${flags} pingcap/rust:latest \
+    ${tidbDockerRoot}/tidb-binlog/bin/drainer \
+    --config=${tidbDockerRoot}/binlog_drainer/conf/drainer.toml \
+    --log-file=${tidbDockerRoot}/binlog_drainer/logs/drainer.log \
+    --data-dir=${tidbDockerRoot}/binlog_drainer/data  \
+    --addr=${ip}:8249 \
+    --advertise-addr=${ip}:8249 \
+    --pd-urls=${cluster} 
+}
+
+stop_binlog_pump(){
+  local node=${1:?"undefined pump"};shift
+  stop_node ${node}
+}
+
+stop_binlog_drainer(){
+  local node=${1:?"undefined drainer"};shift
+  stop_node ${node}
+}
+
+restart_binlog_pump(){
+  local node=${1:?"undefined pump"};shift
+  stop_binlog_pump ${node}
+  start_binlog_pump ${node}
+}
+
+restart_binlog_drainer(){
+  local node=${1:?"undefined drainer"};shift
+  stop_binlog_drainer ${node}
+  start_binlog_drainer ${node}
+}
+
+bootstrap_binlog_pump(){
+  local node=${1:?"undefined pump"};shift
+  stop ${node}
+  [ -d ${PWD}/${node}_data ] && rm -fr ${PWD}/${node}_data/*
+  [ -d ${PWD}/${node}_logs ] && rm -fr ${PWD}/${node}_logs/*
+}
+
+bootstrap_binlog_drainer(){
+  local node=${1:?"undefined drainer"};shift
+  stop ${node}
+  [ -d ${PWD}/${node}_data ] && rm -fr ${PWD}/${node}_data/*
+  [ -d ${PWD}/${node}_logs ] && rm -fr ${PWD}/${node}_logs/*
+}
+
+start_all_binlog_pump(){
+  for node in $(eval "echo binlog_pump{0..$((${binlog_pump_num}-1))}") ;do
+    start_binlog_pump ${node}
+  done
+}
+
+start_all_binlog_drainer(){
+  for node in $(eval "echo binlog_drainer{0..$((${binlog_drainer_num}-1))}") ;do
+    start_binlog_drainer ${node}
+  done
+}
+
+stop_all_binlog_pump(){
+  for node in $(eval "echo binlog_pump{0..$((${binlog_pump_num}-1))}") ;do
+    stop_binlog_pump ${node}
+  done
+}
+
+stop_all_binlog_drainer(){
+  for node in $(eval "echo binlog_drainer{0..$((${binlog_drainer_num}-1))}") ;do
+    stop_binlog_drainer ${node}
+  done
+}
+
+restart_all_binlog_pump(){
+  for node in $(eval "echo binlog_pump{0..$((${binlog_pump_num}-1))}") ;do
+    restart_binlog_pump ${node}
+  done
+}
+
+restart_all_binlog_drainer(){
+  for node in $(eval "echo binlog_drainer{0..$((${binlog_drainer_num}-1))}") ;do
+    restart_binlog_drainer ${node}
+  done
+}
+
+bootstrap_all_binlog_pump(){
+  for node in $(eval "echo binlog_pump{0..$((${binlog_pump_num}-1))}") ;do
+    bootstrap_binlog_pump ${node}
+  done
+}
+
+bootstrap_all_binlog_drainer(){
+  for node in $(eval "echo binlog_drainer{0..$((${binlog_drainer_num}-1))}") ;do
+    bootstrap_binlog_drainer ${node}
   done
 }
 

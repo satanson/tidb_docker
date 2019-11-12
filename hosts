@@ -122,3 +122,28 @@
 192.168.173.100 tidb_pushgateway
 192.168.173.101 tidb_prometheus
 192.168.173.102 tidb_grafana
+
+# binlog_pump
+192.168.173.40 binlog_pump0
+192.168.173.41 binlog_pump1
+192.168.173.42 binlog_pump2
+
+# binlog_drainer
+192.168.173.50 binlog_drainer0
+192.168.173.51 binlog_drainer1
+192.168.173.52 binlog_drainer2
+
+# mysqld
+192.168.173.60 mysqld0
+192.168.173.61 mysqld1
+192.168.173.62 mysqld2
+
+# mysql
+192.168.173.70 mysql0
+192.168.173.71 mysql1
+192.168.173.72 mysql2
+
+# mysql
+192.168.173.80 mysql_tidb_client0
+192.168.173.81 mysql_tidb_client1
+192.168.173.82 mysql_tidb_client2
