@@ -25,6 +25,7 @@ stop_node(){
 
 bootstrap_pd_server(){
   local node=${1:?"undefined 'pd_server'"};shift
+  stop_node ${node}
   rm -fr ${basedir:?"undefined"}/${node}_data/*
   rm -fr ${basedir:?"undefined"}/${node}_logs/*
 }
@@ -96,6 +97,7 @@ restart_all_pd_server(){
 
 bootstrap_tikv_server(){
   local name=$1;shift
+  stop_node ${name}
   rm -fr ${basedir:?"undefined"}/${name}_data/*
   rm -fr ${basedir:?"undefined"}/${name}_logs/*
 }
@@ -164,6 +166,7 @@ restart_all_tikv_server(){
 
 bootstrap_tidb_server(){
   local node=${1:?"undefined tidb_server"};shift
+  stop_node ${node}
   rm -fr ${basedir:?"undefined"}/${node}_data/*
   rm -fr ${basedir:?"undefined"}/${node}_logs/*
 }
@@ -244,13 +247,16 @@ start_binlog_pump(){
   rm -fr ${PWD}/${node}_logs/*
   mkdir -p ${PWD}/${node}_logs
   docker run ${dockerFlags} ${flags} pingcap/rust:latest \
-    ${tidbDockerRoot}/tidb-binlog/bin/pump \
+    bash -c "${tidbDockerRoot}/tidb-binlog/bin/pump \
+    -L debug \
     --config=${tidbDockerRoot}/binlog_pump/conf/pump.toml \
     --log-file=${tidbDockerRoot}/binlog_pump/logs/pump.log \
     --data-dir=${tidbDockerRoot}/binlog_pump/data \
     --addr=${ip}:8250 \
     --advertise-addr=${ip}:8250 \
-    --pd-urls=${cluster}
+    --pd-urls=${cluster} \
+    >${tidbDockerRoot}/binlog_pump/logs/stdout \
+    2>${tidbDockerRoot}/binlog_pump/logs/stderr"
 }
 
 start_binlog_drainer(){
@@ -269,6 +275,7 @@ start_binlog_drainer(){
   mkdir -p ${PWD}/${node}_logs
   docker run ${dockerFlags} ${flags} pingcap/rust:latest \
     ${tidbDockerRoot}/tidb-binlog/bin/drainer \
+    -L debug \
     --config=${tidbDockerRoot}/binlog_drainer/conf/drainer.toml \
     --log-file=${tidbDockerRoot}/binlog_drainer/logs/drainer.log \
     --data-dir=${tidbDockerRoot}/binlog_drainer/data  \
@@ -301,14 +308,14 @@ restart_binlog_drainer(){
 
 bootstrap_binlog_pump(){
   local node=${1:?"undefined pump"};shift
-  stop ${node}
+  stop_node ${node}
   [ -d ${PWD}/${node}_data ] && rm -fr ${PWD}/${node}_data/*
   [ -d ${PWD}/${node}_logs ] && rm -fr ${PWD}/${node}_logs/*
 }
 
 bootstrap_binlog_drainer(){
   local node=${1:?"undefined drainer"};shift
-  stop ${node}
+  stop_node ${node}
   [ -d ${PWD}/${node}_data ] && rm -fr ${PWD}/${node}_data/*
   [ -d ${PWD}/${node}_logs ] && rm -fr ${PWD}/${node}_logs/*
 }

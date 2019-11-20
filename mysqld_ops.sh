@@ -61,6 +61,7 @@ select * from id_gen;
 DONE
   
   sleep 2
+  docker kill ${cliNode}
   docker run -it ${dockerFlags} ${cliExtraFlags} -v ${PWD}/test.sql:/root/test.sql ${image}  /bin/bash -c "mysql -h ${ip} -P3306 -uroot --connect-expired-password -p123456 <test.sql"
   docker kill ${node}
 }

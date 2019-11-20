@@ -130,8 +130,8 @@
 
 # binlog_drainer
 192.168.173.50 binlog_drainer0
-192.168.173.51 binlog_drainer1
-192.168.173.52 binlog_drainer2
+#192.168.173.51 binlog_drainer1
+#192.168.173.52 binlog_drainer2
 
 # mysqld
 192.168.173.60 mysqld0

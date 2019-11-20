@@ -128,3 +128,22 @@ endsWith(){
     return 0
   fi
 }
+
+green_print(){
+  echo -e "\e[32;40;1m$*\e[m" 
+}
+
+red_print(){
+  echo -e "\e[31;40;1m$*\e[m"
+}
+
+yellow_print(){
+  echo -e "\e[33;100;1m$*\e[m"
+}
+
+replace(){
+  local s=${1:?"undefind 's'"};shift
+  local a=${1:?"undefined 'a'"};shift
+  local b=${1:?"undefined 'b'"};shift
+  perl -e "print qq/${s}/ =~ y/${a}/${b}/r"
+}
